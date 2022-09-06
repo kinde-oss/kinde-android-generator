@@ -1,0 +1,53 @@
+plugins {
+    id "java-library"
+    id "org.openapi.generator" version "6.0.1"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+}
+
+
+def getPathToYaml() {
+    def envFile = rootProject.file('env.properties')
+
+    if (envFile.exists()) {
+        def properties = new Properties()
+        properties.load(new FileInputStream(envFile))
+        return properties['yaml_path']
+    } else return ""
+}
+
+def getPathToSDK() {
+    def envFile = rootProject.file('env.properties')
+
+    if (envFile.exists()) {
+        def properties = new Properties()
+        properties.load(new FileInputStream(envFile))
+        return properties['sdk_dir']
+    } else return ""
+}
+
+openApiGenerate {
+    generatorName = "kotlin"
+    inputSpec = file(getPathToYaml()).toString()
+    outputDir = file(getPathToSDK()).toString()
+    apiPackage = "au.kinde.sdk.api"
+    packageName = "au.kinde.sdk"
+    invokerPackage = "au.kinde.sdk.invoker"
+    modelPackage = "au.kinde.sdk.api.model"
+    generateApiDocumentation = false
+    generateApiTests = false
+    generateModelDocumentation = false
+    generateModelTests = false
+    skipOverwrite = true
+    configOptions = [
+            dateLibrary         : "threetenbp-localdatetime",
+            library             : "jvm-retrofit2",
+            serializationLibrary: "gson"
+    ]
+}
