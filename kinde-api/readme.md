@@ -9,7 +9,7 @@
             sdk_dir=../kinde-sdk/
 
 
-2. Navigate to `kinde-api` directory and run `generate.sh`
+2. Navigate to `root` directory and run `generate.sh`
 
 
 
