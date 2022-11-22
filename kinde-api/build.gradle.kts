@@ -38,7 +38,6 @@ openApiGenerate {
     outputDir.set(file(getPathFromProperties(sdkDirProp).orEmpty()).toString())
     apiPackage.set(apiPackageStr)
     packageName.set(sdkPackageStr)
-    invokerPackage.set("$sdkPackageStr.invoker")
     modelPackage.set(modelPackageStr)
     generateApiDocumentation.set(false)
     generateApiTests.set(false)
