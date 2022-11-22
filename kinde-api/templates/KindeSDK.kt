@@ -144,6 +144,10 @@ class KindeSDK(
             .build()
         val endSessionIntent = authService.getEndSessionRequestIntent(endSessionRequest)
         endTokenLauncher.launch(endSessionIntent)
+
+        apiClient.setBearerToken("")
+        sdkListener.onLogout()
+        authPrefs.edit().remove(AUTH_STATE_PREF).apply()
     }
 
     %FUNCTIONS%
