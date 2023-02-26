@@ -42,6 +42,8 @@ import java.security.spec.RSAPublicKeySpec
  */
 class KindeSDK(
     activity: AppCompatActivity,
+    private val loginRedirect: String,
+    private val logoutRedirect: String,
     private val scopes: List<String> = DEFAULT_SCOPES,
     private val sdkListener: SDKListener
 ) {
@@ -119,6 +121,11 @@ class KindeSDK(
         } else {
             null
         }
+        if (!loginRedirect.startsWith(REDIRECT_URI_SCHEME)
+            || !logoutRedirect.startsWith(REDIRECT_URI_SCHEME)
+        ) {
+            sdkListener.onException(IllegalStateException("Check your redirect urls"))
+        }
 
         serviceConfiguration = AuthorizationServiceConfiguration(
             Uri.parse(AUTH_URL.format(domain)),
@@ -182,8 +189,8 @@ class KindeSDK(
 
     fun logout() {
         val endSessionRequest = EndSessionRequest.Builder(serviceConfiguration)
-            .setPostLogoutRedirectUri(Uri.parse(REDIRECT_URI.format(domain)))
-            .setAdditionalParameters(mapOf(REDIRECT_PARAM_NAME to REDIRECT_URI.format(domain)))
+            .setPostLogoutRedirectUri(Uri.parse(logoutRedirect))
+            .setAdditionalParameters(mapOf(REDIRECT_PARAM_NAME to logoutRedirect))
             .setState(null)
             .build()
         val endSessionIntent = authService.getEndSessionRequestIntent(endSessionRequest)
@@ -217,7 +224,8 @@ class KindeSDK(
     fun getPermission(permission: String): ClaimData.Permission {
         return ClaimData.Permission(
             getClaim(ORG_CODE_CLAIM).orEmpty(),
-            getClaim(PERMISSIONS_CLAIM)?.contains(permission) == true,
+            (getClaim(PERMISSIONS_CLAIM, isList = true) as? List<String> ?: emptyList())
+                .contains(permission)
         )
     }
 
@@ -225,6 +233,12 @@ class KindeSDK(
         return ClaimData.Organizations(
             getClaim(ORG_CODES_CLAIM, TokenType.ID_TOKEN, isList = true) as? List<String>
                 ?: emptyList()
+        )
+    }
+    
+    fun getOrganization(): ClaimData.Organization {
+        return ClaimData.Organization(
+            getClaim(ORG_CODE_CLAIM).orEmpty()
         )
     }
 
@@ -242,7 +256,7 @@ class KindeSDK(
             serviceConfiguration, // the authorization service configuration
             clientId, // the client ID, typically pre-registered and static
             ResponseTypeValues.CODE, // the response_type value: we want a code
-            Uri.parse(REDIRECT_URI.format(domain))
+            Uri.parse(loginRedirect)
         )
             .setCodeVerifier(verifier)
             .setAdditionalParameters(buildMap {
@@ -304,6 +318,7 @@ class KindeSDK(
                     for (i in 0 until list.length()) {
                         claims.add(list.getString(i))
                     }
+                    claims
                 } else {
                     data.getString(claim)
                 }
@@ -354,11 +369,15 @@ class KindeSDK(
             sdkListener.onException(WrongThreadException)
             return null
         }
-        val response = call.execute()
-        if (response.isSuccessful) {
-            return response.body()
-        } else {
-            sdkListener.onException(Exception("response is unsuccessful:${response.code()} ${response.message()}"))
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+                return response.body()
+            } else {
+                sdkListener.onException(Exception("response is unsuccessful:${response.code()} ${response.message()}"))
+            }
+        }catch (e:Exception){
+            sdkListener.onException(e)
         }
         return null
     }
@@ -375,7 +394,7 @@ class KindeSDK(
         private const val AUTH_URL = "https://%s/oauth2/auth"
         private const val TOKEN_URL = "https://%s/oauth2/token"
         private const val LOGOUT_URL = "https://%s/logout"
-        private const val REDIRECT_URI = "au.kinde://%s/kinde_callback"
+        private const val REDIRECT_URI_SCHEME = "kinde.sdk://"
 
         private const val REGISTRATION_PAGE_PARAM_NAME = "start_page"
         private const val REGISTRATION_PAGE_PARAM_VALUE = "registration"
