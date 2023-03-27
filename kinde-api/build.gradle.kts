@@ -39,9 +39,9 @@ openApiGenerate {
     apiPackage.set(apiPackageStr)
     packageName.set(sdkPackageStr)
     modelPackage.set(modelPackageStr)
-    generateApiDocumentation.set(false)
+    generateApiDocumentation.set(true)
     generateApiTests.set(false)
-    generateModelDocumentation.set(false)
+    generateModelDocumentation.set(true)
     generateModelTests.set(false)
     skipOverwrite.set(true)
     configOptions.set(
