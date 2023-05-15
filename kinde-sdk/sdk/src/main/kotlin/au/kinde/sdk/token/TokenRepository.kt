@@ -32,7 +32,7 @@ class TokenRepository(private val tokenApi: TokenApi, private val version: Strin
         if (exception != null) return Pair(
             null,
             AuthorizationException(
-                TYPE_GENERAL_ERROR,+
+                TYPE_GENERAL_ERROR,
                 SERVER_ERROR.code,
                 null,
                 exception.message,
@@ -73,39 +73,6 @@ class TokenRepository(private val tokenApi: TokenApi, private val version: Strin
             )
         }
 
-//        if (response.idToken != null) {
-//            val idToken: IdToken = try {
-//                IdToken.from(response.idToken)
-//            } catch (ex: IdTokenException) {
-//                mCallback.onTokenRequestCompleted(
-//                    null,
-//                    AuthorizationException.fromTemplate(
-//                        AuthorizationException.GeneralErrors.ID_TOKEN_PARSING_ERROR,
-//                        ex
-//                    )
-//                )
-//                return
-//            } catch (ex: JSONException) {
-//                callback(
-//                    null,
-//                    AuthorizationException.fromTemplate(
-//                        AuthorizationException.GeneralErrors.ID_TOKEN_PARSING_ERROR,
-//                        ex
-//                    )
-//                )
-//                return
-//            }
-//            try {
-//                idToken.validate(
-//                    mRequest,
-//                    mClock,
-//                    mSkipIssuerHttpsCheck
-//                )
-//            } catch (ex: AuthorizationException) {
-//                mCallback.onTokenRequestCompleted(null, ex)
-//                return
-//            }
-//        }
         Logger.debug("Token exchange with %s completed")
         return Pair(response, null)
     }
