@@ -44,7 +44,7 @@ Run the following command to generate the SDK:
 
 This generator does not require the [OpenAPI Generator CLI](https://openapi-generator.tec/docs/usage) tool since it uses `gradlew` and the [OpenAPI Generator Gradle Plugin](https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-gradle-plugin) plugin to generate the SDK. 
 
-**Note:** The API specifications should always point to Kinde's hosted version: https://kinde.com/api/kinde-mgmt-api-specs.yaml. Please replace this file in the project root with that of the hosted version before 
+**Note:** The API specifications should always point to Kinde's hosted version: https://api-spec.kinde.com/kinde-combined-api-specs.yaml. Please replace this file in the project root with that of the hosted version before 
 generating the SDK.
 
 The SDK gets outputted to: `kinde-sdk`, which you can enter via:
